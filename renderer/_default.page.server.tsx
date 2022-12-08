@@ -1,20 +1,20 @@
 import ReactDOMServer from 'react-dom/server'
 import React from 'react'
-import { PageShell } from './PageShell'
+import { App } from './App'
 import { escapeInject, dangerouslySkipEscape } from 'vite-plugin-ssr'
 import logoUrl from './logo.svg'
 import type { PageContextServer } from './types'
 
 export { render }
 // See https://vite-plugin-ssr.com/data-fetching
-export const passToClient = ['pageProps', 'urlPathname']
+export const passToClient = ['pageProps', 'urlPathname', 'documentProps']
 
 async function render(pageContext: PageContextServer) {
   const { Page, pageProps } = pageContext
   const pageHtml = ReactDOMServer.renderToString(
-    <PageShell pageContext={pageContext}>
+    <App pageContext={pageContext}>
       <Page {...pageProps} />
-    </PageShell>
+    </App>
   )
 
   // See https://vite-plugin-ssr.com/head
