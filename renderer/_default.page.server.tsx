@@ -7,15 +7,23 @@ import type { PageContextServer } from './types'
 
 export { render }
 // See https://vite-plugin-ssr.com/data-fetching
-export const passToClient = ['pageProps', 'urlPathname', 'documentProps']
+export const passToClient = ['pageProps', 'documentProps', 'urlPathname', 'documentProps']
 
 async function render(pageContext: PageContextServer) {
-  const { Page, pageProps } = pageContext
-  const pageHtml = ReactDOMServer.renderToString(
-    <App pageContext={pageContext}>
-      <Page {...pageProps} />
-    </App>
-  )
+  let pageHtml
+
+  if (!pageContext.Page) {
+    // SPA
+    pageHtml = ''
+  } else {
+    // SSR / HTML-only
+    const { Page, pageProps } = pageContext
+    pageHtml = ReactDOMServer.renderToString(
+      <App pageContext={pageContext}>
+        <Page {...pageProps} />
+      </App>
+    )
+  }
 
   // See https://vite-plugin-ssr.com/head
   const { documentProps } = pageContext.exports

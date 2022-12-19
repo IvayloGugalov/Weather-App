@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AirPollutionProps, Pollution, PollutionComponents, POLLUTION_UNITS } from '../types/Pollution'
 
 import { format } from 'date-fns'
@@ -67,52 +67,62 @@ function calculateStatColor(pollutionType: string, value: string) {
   }
 }
 
-const AirPollutionCard = ({lon, lat}: {lon: string, lat: string}) => {
+const AirPollutionCard = ({lon, lat}: {lon: number, lat: number}) => {
 
   if (!lon || !lat) {
     return <></>
   }
 
-  // const { pollution, loading, error } : {pollution:Pollution, loading: boolean, error: string} = useFetchAirPollution(lon, lat)
-  const pollution : Pollution = {
-    components: {
-      co:    '587.46',
-      no:    '0.67',
-      no2:   '30.5',
-      o3:    '45.78',
-      so2:   '2.03',
-      pm2_5: '27.63',
-      pm10:  '52.17',
-      nh3:   '1.31'
-    },
-    date: 1670246640
-  }
+  // const { data, loading, error } : {data:Pollution | null, loading: boolean, error: string | null} = useFetchAirPollution(lon, lat)
+  const [loading, setIsLoading] = useState<boolean>(true)
+  const [data, setData] = useState<Pollution | null>(null)
+
+  const error = null
+
+  setTimeout(() => {
+    setIsLoading(false)
+    setData({
+      components: {
+        co:    '587.46',
+        no:    '0.67',
+        no2:   '30.5',
+        o3:    '45.78',
+        so2:   '2.03',
+        pm2_5: '27.63',
+        pm10:  '52.17',
+        nh3:   '1.31'
+      },
+      date: 1670246640
+    })
+  }, 2500)
 
   return (
     <div className='absolute top-4 left-0 flex z-5 max-w-md' >
 
-      {/* {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>} */}
-      {pollution && (
-        <div
-          id='pollution-card'
-          role="tooltip"
-          className="
-            opacity-0
-            left-0
-            mt-2
-            text-sm
-            text-gray-500
-            transition-opacity
-            duration-300
-            border
-            border-gray-400
-            rounded-xl
-            shadow-xl
-            dark:text-gray-400
-            dark:bg-gray-800
-            dark:border-gray-600"
-        >
+    <div
+      id='pollution-card'
+      role="tooltip"
+      className="
+        opacity-0
+        min-w-pollutionCard
+        min-h-pollutionCard
+        left-0
+        mt-2
+        text-sm
+        text-gray-500
+        transition-opacity
+        duration-300
+        border
+        border-gray-400
+        rounded-xl
+        shadow-xl
+        dark:text-gray-400
+        dark:bg-gray-800
+        dark:border-gray-600"
+      >
+        {loading && (<img className='z-10 w-full h-full ml-14' src='../assets/loading.svg'></img>)}
+        {error && <p>{error}</p>}
+        {data && (
           <div
             className="
               p-2
@@ -124,18 +134,18 @@ const AirPollutionCard = ({lon, lat}: {lon: string, lat: string}) => {
             <h2 className='pt-1 text-base font-semibold leading-none text-gray-700 dark:text-white '>
               Polution
             </h2>
-            {pollution?.date && <h3 className='-ml-36 text-xs pt-1 text-gray-700'>{format(new Date(pollution?.date * 1000), 'p, MMM dd')}</h3> }
+            {data?.date && <h3 className='-ml-36 text-xs pt-1 text-gray-700'>{format(new Date(data?.date * 1000), 'p, MMM dd')}</h3> }
 
             <div className='grid grid-cols-2 gap-x-4 px-1'>
-              {Object.keys(pollution?.components).map(component => (
+              {Object.keys(data.components).map(component => (
                 <div key={component}>
-                  {renderPollutionStat(component, pollution.components[component as keyof PollutionComponents])}
+                  {renderPollutionStat(component, data.components[component as keyof PollutionComponents])}
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
     </div>
   )

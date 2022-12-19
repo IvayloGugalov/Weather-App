@@ -1,17 +1,20 @@
-
-
 import React from 'react'
 
-const SearchBar = ({ setSearch, setSearchExecuted }:
-  {setSearch:Function, setSearchExecuted: Function}) => {
+const SearchBar = ({ setSearch, serverSide, setSearchExecuted }:
+  {setSearch:Function, serverSide: boolean, setSearchExecuted?: Function }) => {
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
         const input = document.getElementById('search') as HTMLInputElement;
-        setSearchExecuted(true)
         setSearch(input.value)
+        if (setSearchExecuted !== undefined) {
+          setSearchExecuted(true)
+        }
+        if (serverSide) {
+          window.location.href = `${window.location.origin}/server-side/search/${input.value}`
+        }
       }}
       className='w-full flex justify-center pt-8 pb-4'
     >

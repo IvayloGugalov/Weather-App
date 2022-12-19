@@ -24,3 +24,25 @@ export type AirPollutionProps = {
 export const POLLUTION_UNITS = {
   microGramsPerSquareMeter: 'µg/m³'
 }
+
+export type AirPollutionResponse = {
+  coord:{
+    lon: number,
+    lat: number
+  },
+  list: [
+    {
+      components:{
+        co: number,
+        no: number,
+        no2: number,
+        o3: number,
+        so2: number,
+        pm2_5: number,
+        pm10: number,
+        nh3: number
+      },
+      dt: number
+    }
+  ]
+}

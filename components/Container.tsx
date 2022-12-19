@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import SearchBar from './SearchBar'
-import '../styles/initial.css'
+import ErrorBoundary from '../errors/ErrorBoundary';
 
-const Loading = () => <div>Loading...</div>;
+const Loading = () => <img src='../assets/loading.svg'></img>;
 
 const Container = () => {
-
   const [search, setSearch] = useState<string>('');
   const [searchExecuted, setSearchExecuted] = useState<boolean>(false);
 
@@ -17,7 +16,8 @@ const Container = () => {
         flex-col
         justify-start
         items-center'>
-      <SearchBar setSearch={setSearch} setSearchExecuted={setSearchExecuted} />
+
+      <SearchBar setSearch={setSearch} serverSide={false} setSearchExecuted={setSearchExecuted} />
 
       {searchExecuted && (
         <div>
@@ -32,10 +32,10 @@ function WeatherForecast({search}: {search: string}) {
   // We lazily load the client-side component
   const WeatherForecast = React.lazy(() => import('./WeatherForecast'));
   return (
-    <React.Suspense>
-      <div className='fade-in '>
+    <React.Suspense fallback={<Loading /> }>
+      <ErrorBoundary>
         <WeatherForecast search={search} />
-      </div>
+      </ErrorBoundary>
     </React.Suspense>
   );
 }

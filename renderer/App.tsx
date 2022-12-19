@@ -1,33 +1,29 @@
-import React, { useState } from 'react'
+import React from 'react'
 import logo from './logo.svg'
 import { PageContextProvider } from './usePageContext'
 import type { PageContext } from './types'
 import './App.css'
-import { Link } from './Link'
-
+import Navbar from '../components/Navbar'
 
 export { App }
 
 function App({ children, pageContext }: { children: React.ReactNode; pageContext: PageContext }) {
 
   return (
-      <PageContextProvider pageContext={pageContext}>
-          <Layout>
-            <Content>{children}</Content>
-          </Layout>
-      </PageContextProvider>
+    <PageContextProvider pageContext={pageContext}>
+      <Layout>
+        <Navbar />
+        <Content>
+          {children}
+        </Content>
+      </Layout>
+    </PageContextProvider>
   )
 }
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className='App'
-      style={{
-        display: 'flex',
-        margin: 'auto'
-      }}
-    >
+    <div className='App'>
       {children}
     </div>
   )
@@ -35,12 +31,17 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 function Content({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        minHeight: '100vh'
-      }}
-    >
-      {children}
+    <div id="page-container">
+      <div
+        id="page-content"
+        style={{
+          padding: 20,
+          paddingBottom: 50,
+          minHeight: '50vh'
+        }}
+      >
+        {children}
+      </div>
     </div>
   )
 }

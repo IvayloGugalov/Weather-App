@@ -3,7 +3,10 @@ import ssr from 'vite-plugin-ssr/plugin'
 import { UserConfig } from 'vite'
 
 const config: UserConfig = {
-  plugins: [react(), ssr()]
+  plugins: [react(), ssr({ includeAssetsImportedByServer: true })],
+  build: {
+    ssrManifest: true
+  }
 }
 
 export default config

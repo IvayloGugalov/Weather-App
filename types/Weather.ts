@@ -1,5 +1,3 @@
-import { MouseEventHandler } from "react"
-
 export type Weather = {
   temp: number,
   description: string,
@@ -10,10 +8,10 @@ export type Weather = {
   wind: Wind,
   icon: string,
   coordinates: {
-    lon: string,
-    lat: string
+    lon: number,
+    lat: number
   }
-  timezone: string
+  timezone: number
 }
 
 export type Wind = {
@@ -25,4 +23,31 @@ export const WEATHER_UNITS = {
   temperature: '°C',
   windSpeedKmH: 'km/h',
   humidity: '%'
+}
+
+export type WeatherResponse = {
+  coord: {
+    lon: number,
+    lat: number
+  },
+  weather: [
+    {
+      description: string,
+      icon: string
+    }
+  ],
+  main: {
+    temp: number,
+    feels_like: number,
+    temp_min: number,
+    temp_max: number,
+    pressure: number,
+    humidity: number
+  },
+  wind: {
+    speed: number,
+    deg: number
+  },
+  timezone: number,
+  cod: number
 }

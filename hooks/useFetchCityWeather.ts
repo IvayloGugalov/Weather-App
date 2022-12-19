@@ -1,56 +1,79 @@
-import { useEffect, useReducer } from "react"
-import type { Weather } from '../types/Weather'
-import { ACTIONS } from '../types/fetchActions'
+import { Dispatch, useEffect, useReducer } from "react"
+import type { Weather, WeatherResponse } from '../types/Weather'
+import { Action, State, Types } from '../types/generics'
+import { sleep } from "../helpers/simulateLoad"
 
 const URL = (city:string) =>
   `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_API_KEY}`
 
-function reducer(state:any, action:any) {
+function reducer(state: State<Weather>, action: Action<WeatherResponse>) {
   switch (action.type) {
-    case ACTIONS.MAKE_REQUEST:
-      return { ...state, loading: true, weather: null }
-    case ACTIONS.GET_DATA:
+    case Types.MAKE_REQUEST:
+      return { ...state, loading: true, data: null }
+    case Types.GET_DATA:
+      const weather = action.payload.data;
+      if (!weather) {
+        return { ...state, loading: false }
+      }
       return {
         ...state,
         loading: false,
-        weather: {
-          temp: parseInt(action.payload.weather.main.temp),
-          description: action.payload.weather.weather[0].description,
-          minTemp: parseInt(action.payload.weather.main.temp_min),
-          maxTemp: parseInt(action.payload.weather.main.temp_max),
-          realFeel: parseInt(action.payload.weather.main.feels_like),
-          humidity: parseInt(action.payload.weather.main.humidity),
+        data: {
+          temp: Math.round(weather.main.temp),
+          description: weather.weather[0].description,
+          minTemp: Math.round(weather.main.temp_min),
+          maxTemp: Math.round(weather.main.temp_max),
+          realFeel: Math.round(weather.main.feels_like),
+          humidity: weather.main.humidity,
           wind: {
-            speed: parseInt(action.payload.weather.wind.speed),
-            degrees: parseInt(action.payload.weather.wind.deg)
+            speed: weather.wind.speed.toFixed(1),
+            degrees: weather.wind.deg
           },
-          icon: action.payload.weather.weather[0].main,
-          timezone: action.payload.weather.timezone
+          icon: weather.weather[0].icon,
+          coordinates: weather.coord,
+          timezone: weather.timezone
         },
         error: null
       }
-    case ACTIONS.ERROR:
-      return { ...state, loading: false, error: action.payload.error, weather: null }
+    case Types.ERROR:
+      return { ...state, loading: false, error: action.payload.error, data: null }
     default:
       return state
   }
 }
 
-export default function useFetchCityWeather(city:string) : {weather:Weather, loading: boolean, error: string} {
-  const [state, dispatch] = useReducer(reducer, { weather: {}, loading: true })
+const initialState: State<Weather> = {
+  error: null,
+  loading: false,
+  data: null
+}
+
+export default function useFetchCityWeather(city:string) : State<Weather> {
+  const [state, dispatch]: [State<Weather>, Dispatch<Action<WeatherResponse>>] =
+    useReducer(reducer, initialState)
 
   useEffect(() => {
     const get = async () => {
-      dispatch({ type: ACTIONS.MAKE_REQUEST })
+      dispatch({ type: Types.MAKE_REQUEST, payload: {error: null, data: null, loading: true  } })
       const response = await fetch(URL(city))
 
       if (response.status === 404) {
-        dispatch({ type: ACTIONS.ERROR, payload: { error: 'Oops! Invalid Location ...' } })
+        dispatch({
+          type: Types.ERROR,
+          payload: { error: 'Oops! Invalid Location ...', data: null, loading: false }
+        })
       } else if (response.status !== 200) {
-        dispatch({ type: ACTIONS.ERROR, payload: { error: response.body } })
+        dispatch({
+          type: Types.ERROR,
+          payload: { error: (await response.json()).message, data: null, loading: false  }
+        })
       } else {
         const json = await response.json()
-        dispatch({ type: ACTIONS.GET_DATA, payload: { weather: json } })
+        await sleep(2000)
+        dispatch({
+          type: Types.GET_DATA,
+          payload: { data: json, error: null, loading: false }
+        })
       }
     }
 

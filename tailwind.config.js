@@ -12,9 +12,16 @@ module.exports = {
       },
       textColor: {
         temperature: '#F1983D'
+      },
+      zIndex: {
+        5: '5'
+      },
+      minWidth: {
+        pollutionCard: '200px'
+      },
+      minHeight: {
+        pollutionCard: '300px'
       }
-    },zIndex: {
-      5: '5'
     }
   },
   plugins: [],
